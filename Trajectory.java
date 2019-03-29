@@ -11,11 +11,13 @@ public class Trajectory {
     private double[][] velocity = new double[2][1];
     private double[][] wheelbase_inv = new double[2][2];
     private double det;
+    private double ratio;
 
-    public Trajectory(double x1, double y1, double x2, double y2) {
+    public Trajectory(double x1, double y1, double x2, double y2, double ratio) {
         dx = x2 - x1;
         dy = y2 - y1;
         theta = Math.tan(dy/dx);
+        this.ratio = ratio;
     }
     public void setLinVel() {
         double v1 = dx / Math.cos(theta);
@@ -47,8 +49,8 @@ public class Trajectory {
     }
     public double[][] getWheelSpeed() {
         double[][] wheelSpeeds = new double[2][1];
-        wheelSpeeds[0][0] = det * (wheelbase_inv[0][0] * velocity[0][0] + wheelbase_inv[0][1] * velocity[1][0]);
-        wheelSpeeds[1][0] = det * (wheelbase_inv[1][0] * velocity[0][0] + wheelbase_inv[1][1] * velocity[1][0]);
+        wheelSpeeds[0][0] = ratio * det * (wheelbase_inv[0][0] * velocity[0][0] + wheelbase_inv[0][1] * velocity[1][0]);
+        wheelSpeeds[1][0] = ratio * det * (wheelbase_inv[1][0] * velocity[0][0] + wheelbase_inv[1][1] * velocity[1][0]);
         return wheelSpeeds;
 
     }

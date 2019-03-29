@@ -1,5 +1,5 @@
 public class Spline {
-//commentsdfjsh
+    
     double[] z;
     Point[] points;
     Point target;
