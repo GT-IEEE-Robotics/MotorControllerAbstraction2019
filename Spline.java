@@ -1,5 +1,5 @@
 public class Spline {
-
+//comment
     double[] z;
     Point[] points;
     Point target;
