@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class Spline {
 
     double[] z;
@@ -31,7 +33,7 @@ public class Spline {
     public void calculate(Point[] n, boolean constant, double begin, double end) {
         z = new double[n.length];
 
-        double[][] d = new double[n.length][n.length];
+        double[][] d = new double[n.length][1];
         double[][] a = new double[n.length][n.length];
 
         double estBegin;
@@ -49,25 +51,47 @@ public class Spline {
         for (int i = 0; i < n.length; i++) {
             if (i == 0) {
                 double h = n[i + 1].getX() - n[i].getX();
-                d[i][i] = (6/h)*(n[i + 1].getY() - n[i].getY()) - 6*begin;
+                d[i][0] = (6/h)*(n[i + 1].getY() - n[i].getY()) - 6*estBegin;
+                System.out.println( "D: " + d[i][0]);
                 a[i][i] = h*2;
                 a[i+1][i] = h;
             } else if (i == (n.length - 1)) {
                 double h = n[i].getX() - n[i - 1].getX();
-                d[i][i] = 6*end - (6/h)*(n[i].getY() - n[i - 1].getY());
+                d[i][0] = 6*estEnd - (6/h)*(n[i].getY() - n[i - 1].getY());
+                System.out.println( "D: " + d[i][0]);
                 a[i][i] = 2*h;
                 a[i-1][i] = h;
             } else {
                 double h_upper = n[i + 1].getX() - n[i].getX();
                 double h_lower = n[i].getX() - n[i - 1].getX();
-                d[i][i] = (6/h_upper)*(n[i + 1].getY() - n[i].getY()) - (6/h_lower)*(n[i].getY() - n[i - 1].getY());
+
+                d[i][0] = (6/h_upper)*(n[i + 1].getY() - n[i].getY()) - (6/h_lower)*(n[i].getY() - n[i - 1].getY());
+                System.out.println( "D: " + d[i][0]);
                 a[i][i] = 2*(h_upper+h_lower);
                 a[i+1][i] = h_upper;
                 a[i-1][i] = h_lower;
             }
-            double[][] dinv = Matrix.multiply(a, Matrix.inverse(d));
-            z = dinv[0];
         }
+        System.out.println("D MATRIX?");
+        for (double[] k : d)
+            System.out.println(Arrays.toString(k));
+        System.out.println();
+        double[][] z_inv = Inverse.multiplicar(Inverse.invert(a), d);
+        for (double[] k : d)
+            System.out.println(Arrays.toString(k));
+        System.out.println();
+        System.out.println("THE Z MULT MATRIX");
+        for (double[] k : z_inv)
+             System.out.println(Arrays.toString(k));
+        System.out.println();
+        System.out.println();
+        for (int i = 0; i < z_inv.length; i++) {
+            z[i] = z_inv[i][0];
+        }
+        System.out.println("THE Z MATRIX");
+        for (double k : z)
+            System.out.println(k);
+        System.out.println();
 
     }
 
@@ -107,7 +131,7 @@ public class Spline {
             double step = (diffx / 20);
             //Point[] set = new Point[20];
             for (double j = points[i-1].getX(); j < points[i].getX(); j += step) {
-                System.out.println(j);
+                //System.out.println(j);
                 double y = getY(j,i-1);
                 fullSet[count] = new Point(j, y);
                 count++;
