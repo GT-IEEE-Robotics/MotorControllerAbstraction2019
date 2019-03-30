@@ -62,12 +62,13 @@ public class Spline {
                 a[i+1][i] = h_upper;
                 a[i-1][i] = h_lower;
             }
-            //A* d^-1 = z!
+            double[][] dinv = Matrix.multiply(a, Matrix.inverse(d));
+            z = dinv[0];
         }
 
     }
 
-    public double getY(double x, double n) {
+    public double getY(double x, int n) {
         double h = points[n + 1].getX() - points[n].getX();
         double t_upper = points[n + 1].getX() - x;
         double t_lower = x - points[n].getX();
@@ -75,24 +76,24 @@ public class Spline {
          + getC(n)*t_lower + getD(n)*t_upper;
     }
 
-    public double getA(double n) {
+    public double getA(int n) {
         double h = points[n + 1].getX() - points[n].getX();
         return (z[n]/(6*h));
     }
 
-    public double getB(double n) {
+    public double getB(int n) {
         double h = points[n + 1].getX() - points[n].getX();
         return (z[n + 1]/(6*h));
     }
 
-    public double getC(double n) {
+    public double getC(int n) {
         double h = points[n + 1].getX() - points[n].getX();
         return ((points[n + 1].getY()/h) - ((z[n + 1]*h)/6));
     }
 
-    public double getD(double n) {
+    public double getD(int n) {
         double h = points[n + 1].getX() - points[n].getX();
-        reurn ((points[n].getY()/h) - ((z[n]*h)/6));
+        return ((points[n].getY()/h) - ((z[n]*h)/6));
     }
 
     public Point[] getXYSet() {
