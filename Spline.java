@@ -96,13 +96,13 @@ public class Spline {
     }
 
     public Point[] getXYSet() {
-        Point[] fullSet = new Point[20*n.length];
+        Point[] fullSet = new Point[20*points.length];
         int count = 0;
-        for (int i = 1; i <= n.length; i++) {
-            double diffx = n[i].getX() - n[i-1].getX();
-            double step = floor(diffx / 20);
+        for (int i = 1; i <= points.length; i++) {
+            double diffx = points[i].getX() - points[i-1].getX();
+            double step = Math.floor(diffx / 20);
             //Point[] set = new Point[20];
-            for (int j = n[i-1].getX(); j < n[i].getX(); j += step) {
+            for (double j = points[i-1].getX(); j < points[i].getX(); j += step) {
                 double y = getY(j,i-1);
                 fullSet[count] = new Point(j, y);
                 count++;
