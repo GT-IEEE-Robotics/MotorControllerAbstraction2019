@@ -3,10 +3,15 @@
 
 /* pin defintions */
 #define PWMA (6)    // output PWM signal for motor A
-#define ENC_A (2)   // Encoder Input A
-#define ENC_B (3)   // Encoder Input B
+#define PWMB (5)    // output PWM signal for motor B
+#define ENC_A (2)   // Encoder Input A for motor A
+#define ENC_B (3)   // Encoder Input B for motor A
+#define ENC_C (8)   // Encoder Input A for motor B
+#define ENC_D (9)   // Encoder Input A for motor B
 #define AIN1 (10)
-#define AIN2 (11)
+#define AIN2 (11)   // AIN1/2 for motor A
+#define BIN1 (12)
+#define BIN2 (13)   // AIN1/2 for motor B
 
 /* Global Variables */
 // Encoder variables
@@ -19,8 +24,8 @@ unsigned long t_duration = 0;
 unsigned long curr_time = 0;
 
 // PID variables
-double ref_angular_pos = 20;    // 20 revolutions from start
-double ref_angular_speed = -8;  // 7 revolutions per second
+double ref_angular_speed = 7;  // THIS IS THE DESIRED SPEED FOR MOTOR A, in rev/s
+double ref_angular_pos = 20;   
 double curr_angular_pos = 0;
 double curr_angular_speed = 0;
 double curr_error_ang_pos = ref_angular_pos;       // initialize the error signals
@@ -48,19 +53,24 @@ double pwm_output;
 double pwm_scale = 500;
 
 // TESTING PURPOSE
-double curr_sec = 0;
-double ref_angular_speed_sequence[] = {-8,-7,-6,-5,-4,-3,-2,0,2,3,4,5,6,7,8};
-int8_t ref_speed_seq_length = 15;
-int8_t curr_speed_seq_idx = 0;
+//double curr_sec = 0;
+//double ref_angular_speed_sequence[] = {-8,-7,-6,-5,-4,-3,-2,0,2,3,4,5,6,7,8};
+//int8_t ref_speed_seq_length = 15;
+//int8_t curr_speed_seq_idx = 0;
 
 void setup() {
     // initialize digital pin LED_BUILTIN as an output.
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(AIN1, OUTPUT);
     pinMode(AIN2, OUTPUT);
+    pinMode(BIN1,OUTPUT);
+    pinMode(BIN2,OUTPUT);
     pinMode(PWMA, OUTPUT);
+    pinMode(PWMB, OUTPUT);
     pinMode(ENC_A, INPUT);
     pinMode(ENC_B, INPUT);
+    pinMode(ENC_C, INPUT);
+    pinMode(ENC_D, INPUT);
 
     Serial.begin(9600);      // open the serial port at 115200bps
 
@@ -75,19 +85,19 @@ void setup() {
 void loop() {
 
     // TESTING: SEQUENCE OF REF SPEED, FIXED DURATION
-    if (millis() / 1000 - curr_sec > 2)
-    {
-        if (curr_speed_seq_idx < ref_speed_seq_length)
-        {
-            curr_speed_seq_idx = curr_speed_seq_idx + 1;
-            ref_angular_speed = ref_angular_speed_sequence[curr_speed_seq_idx];
-        }
-        else
-        {
-            ref_angular_speed = 7;
-        }
-        curr_sec = millis() / 1000;
-    }
+    //if (millis() / 1000 - curr_sec > 2)
+    //{
+    //    if (curr_speed_seq_idx < ref_speed_seq_length)
+    //    {
+    //        curr_speed_seq_idx = curr_speed_seq_idx + 1;
+    //        ref_angular_speed = ref_angular_speed_sequence[curr_speed_seq_idx];
+    //    }
+    //    else
+    //    {
+    //        ref_angular_speed = 7;
+    //    }
+    //    curr_sec = millis() / 1000;
+    //}
     
     // wait for 0.2 sec between loops
     delay(200);
