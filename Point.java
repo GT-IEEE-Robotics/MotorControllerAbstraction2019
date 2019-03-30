@@ -42,4 +42,9 @@ public class Point {
         return Math.tan((two.getY() - y)/(two.getX() - x));
     }
 
+    public String toString() {
+        String ret = "X: " + x + "; Y: " + y;
+        return ret;
+    }
+
 }
