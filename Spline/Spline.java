@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.ArrayList;
 
 public class Spline {
 
@@ -124,7 +125,7 @@ public class Spline {
     }
 
     public Point[] getXYSet() {
-        Point[] fullSet = new Point[20*(points.length - 1) + 1];
+        ArrayList<Point> fullSet = new ArrayList<>();
         int count = 0;
         for (int i = 1; i < points.length; i++) {
             double diffx = points[i].getX() - points[i-1].getX();
@@ -133,11 +134,15 @@ public class Spline {
             for (double j = points[i-1].getX(); j < points[i].getX(); j += step) {
                 //System.out.println(j);
                 double y = getY(j,i-1);
-                fullSet[count] = new Point(j, y);
+                fullSet.add(new Point(j, y));
                 count++;
             }
         }
-        return fullSet;
+        Point[] returnArray = new Point[fullSet.size()];
+        for (int i = 0; i < returnArray.length;i++) {
+            returnArray[i] = fullSet.get(i);
+        }
+        return returnArray;
     }
 
 }
