@@ -17,7 +17,7 @@ public class Trajectory
     double[] theta_arr = new double[2];
     double[] velocity = new double[2];
     double[][] wheelbase_inv = new double[2][2];
-    double[] wheelSpeeds = new double[2];
+    Double[] wheelSpeeds = new Double[2];
     double det;
     double ratio;
 public Trajectory(double old_x, double old_y, double init_theta_input, double r_wheel, double l_wheelbase, double ratio_input)
@@ -123,7 +123,7 @@ public void getRatio()
     ratio = 2.5 / (Math.abs(velocity[1]) + 0.05);
 }
 
-public double[] getWheelSpeed()
+public Double[] getWheelSpeed()
 {
     wheelSpeeds[0] = ratio * (1/det) * (wheelbase_inv[0][0] * velocity[0] + wheelbase_inv[0][1] * velocity[1]);
     wheelSpeeds[1] = ratio * (1/det) * (wheelbase_inv[1][0] * velocity[0] + wheelbase_inv[1][1] * velocity[1]);
