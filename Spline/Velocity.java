@@ -16,15 +16,17 @@ public class Velocity {
         ArrayList<Double> currOverlap = new ArrayList<>();
         ArrayList<Double> xValues = new ArrayList<>();
         ArrayList<Double> yValues = new ArrayList<>();
+        double deriv = 0;
         boolean first = true;
-        while (i < (coordinates.length - subsection)) {
+        while (i <= (coordinates.length - subsection)) {
             //currOverlap.add(coordinates[i].getY());
             prevOverlap = currOverlap;
             currOverlap = new ArrayList<>();
             Point[] sub = subSection(coordinates, i, i + subsection);
-            Spline spline = new Spline(sub);
+            Spline spline = new Spline(sub, deriv);
             Point[] subPoints = spline.getXYSet();
             int prevIndex = 0;
+            boolean end = false;
             for (int j = 0; j < subPoints.length; j++) {
                 double ratio = 1.0;
                 // if (index > (coordinates.length*20 - lastRatio)) {
@@ -32,13 +34,13 @@ public class Velocity {
                 //     lastRatioIndex++;
                 // }
                 double x = subPoints[j].getX();
-                double y;
-                if (j < subPoints.length/2) {
-                    if (first) {
-                        y = subPoints[j].getY();
-                    } else {
-                        y = (prevOverlap.get(j) + subPoints[j].getY())/2.0;
-                    }
+                double y = subPoints[j].getY();
+                // if (j < subPoints.length/2) {
+                //     if (first) {
+                //         y = ;
+                //     } else {
+                //         y = (prevOverlap.get(j) + subPoints[j].getY())/2.0;
+                //     }
                     trajectory.getNextPoint(x, y);
                     xValues.add(x);
                     yValues.add(y);
@@ -53,17 +55,26 @@ public class Velocity {
                     wheelSpeeds[0] = ratio*wheelSpeeds[0];
                     wheelSpeeds[1] = ratio*wheelSpeeds[1];
                     speeds.add(wheelSpeeds);
-                } else {
-                    y = subPoints[j].getY();
-                    currOverlap.add(y);
-                }
+                // } else {
+                //     y = subPoints[j].getY();
+                //     currOverlap.add(y);
+                // }
 
                 index++;
             }
             System.out.println("SIZES: " + currOverlap.size() + ", " + prevOverlap.size());
             first = false;
-            i += subsection/2;
-            index -= subsection/2;
+            i += subsection - 1;
+            // if (!end && (i + subsection/2) > (coordinates.length - subsection)) {
+            //     end = true;
+            //     i = coordinates.length - (3*subsection)/4;
+            // }
+            // index -= subsection/2;
+            double lastX = xValues.get(xValues.size() - 1);
+            double lastY = yValues.get(yValues.size() - 1);
+            double secondLastX = xValues.get(xValues.size() - 20);
+            double secondLastY = yValues.get(yValues.size() - 20);
+            deriv = (lastY - secondLastY)/(lastX - secondLastX);
             prevIndex = 0;
         }
         for (int k = 0; k < xValues.size(); k++) {

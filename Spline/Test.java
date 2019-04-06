@@ -17,7 +17,7 @@ public class Test {
             new Point(17, 17.0),
             new Point(18, 19.1)
         };
-        Velocity vel = new Velocity(test, 5, 10, .1);
+        Velocity vel = new Velocity(test, 3, 10, .1);
         // for (int i = 0; i < points.length; i++) {
         //     writer.println(points[i].getX() + "," + points[i].getY());
         // }

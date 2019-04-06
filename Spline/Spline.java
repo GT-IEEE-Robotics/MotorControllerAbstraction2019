@@ -17,6 +17,11 @@ public class Spline {
         calculate(points, false, begin, end);
     }
 
+    public Spline(Point[] n, double begin) {
+        points = n;
+        calculate(points, false, begin, 0);
+    }
+
     public Spline(Point[] n, Point target) {
         this.target = target;
         points = n;
@@ -46,7 +51,8 @@ public class Spline {
                 .getY())/(n[n.length - 1].getX() - n[n.length - 2].getX());
         } else {
             estBegin = begin;
-            estEnd = end;
+            estEnd = (n[n.length - 1].getY() - n[n.length - 2]
+                .getY())/(n[n.length - 1].getX() - n[n.length - 2].getX());
         }
 
         for (int i = 0; i < n.length; i++) {
