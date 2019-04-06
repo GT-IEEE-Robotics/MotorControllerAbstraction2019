@@ -12,21 +12,27 @@ public class Velocity {
         int lastRatioIndex = 0;
         Trajectory trajectory = new Trajectory(coordinates[0].getX(), coordinates[0].getY(), 0, 5.0, 10.0, 1);
         int i = 0;
-        ArrayList<Double> prevOverlap = new ArrayList<>();
-        ArrayList<Double> currOverlap = new ArrayList<>();
+
         ArrayList<Double> xValues = new ArrayList<>();
         ArrayList<Double> yValues = new ArrayList<>();
         double deriv = 0;
         boolean first = true;
-        while (i <= (coordinates.length - subsection)) {
+        int lastBegin = 0;
+        boolean end = false;
+        boolean finish = false;
+        while (!finish && (i <= (coordinates.length - subsection) || end)) {
             //currOverlap.add(coordinates[i].getY());
-            prevOverlap = currOverlap;
-            currOverlap = new ArrayList<>();
-            Point[] sub = subSection(coordinates, i, i + subsection);
+
+            Point[] sub;
+            if (end) {
+                sub = subSection(coordinates, i, coordinates.length);
+                finish = true;
+            } else {
+                sub = subSection(coordinates, i, i + subsection);
+            }
             Spline spline = new Spline(sub, deriv);
             Point[] subPoints = spline.getXYSet();
             int prevIndex = 0;
-            boolean end = false;
             for (int j = 0; j < subPoints.length; j++) {
                 double ratio = 1.0;
                 // if (index > (coordinates.length*20 - lastRatio)) {
@@ -62,21 +68,27 @@ public class Velocity {
 
                 index++;
             }
-            System.out.println("SIZES: " + currOverlap.size() + ", " + prevOverlap.size());
+
             first = false;
             i += subsection - 1;
-            // if (!end && (i + subsection/2) > (coordinates.length - subsection)) {
-            //     end = true;
-            //     i = coordinates.length - (3*subsection)/4;
-            // }
-            // index -= subsection/2;
+
             double lastX = xValues.get(xValues.size() - 1);
             double lastY = yValues.get(yValues.size() - 1);
             double secondLastX = xValues.get(xValues.size() - 20);
             double secondLastY = yValues.get(yValues.size() - 20);
             deriv = (lastY - secondLastY)/(lastX - secondLastX);
             prevIndex = 0;
+
+            if (i > (coordinates.length - subsection)) {
+                end = true;
+                i = coordinates.length - (coordinates.length % subsection);
+                if (i >= coordinates.length - 1) {
+                    finish = true;
+                }
+            }
+            System.out.println("I: " + i);
         }
+
         for (int k = 0; k < xValues.size(); k++) {
             writer.println(xValues.get(k) + "," + yValues.get(k));
         }
