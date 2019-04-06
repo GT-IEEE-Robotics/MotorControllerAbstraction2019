@@ -3,8 +3,6 @@ import java.io.PrintWriter;
 
 public class Test {
     public static void main(String[] args) throws Exception {
-        //File f = new File("hello.csv");
-        //PrintWriter writer = new PrintWriter(f);
         Point[] test = {
             new Point(0, 0),
             new Point(1, 3),
@@ -18,9 +16,5 @@ public class Test {
             new Point(18, 19.1)
         };
         Velocity vel = new Velocity(test, 5, 10, .1);
-        // for (int i = 0; i < points.length; i++) {
-        //     writer.println(points[i].getX() + "," + points[i].getY());
-        // }
-        // writer.close();
     }
 }

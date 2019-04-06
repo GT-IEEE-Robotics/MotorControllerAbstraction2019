@@ -13,15 +13,16 @@ public class Velocity {
         Trajectory trajectory = new Trajectory(coordinates[0].getX(), coordinates[0].getY(), 0, 5.0, 10.0, 1);
         int i = 0;
 
+        double endPoint = coordinates[coordinates.length - 1];
+        double distance = coordinates[0].getDistance(endPoint);
+        double endDistance = endRatio*distance;
+
         ArrayList<Double> xValues = new ArrayList<>();
         ArrayList<Double> yValues = new ArrayList<>();
         double deriv = 0;
-        boolean first = true;
-        int lastBegin = 0;
         boolean end = false;
         boolean finish = false;
         while (!finish && (i <= (coordinates.length - subsection) || end)) {
-            //currOverlap.add(coordinates[i].getY());
 
             Point[] sub;
             if (end) {
@@ -32,44 +33,31 @@ public class Velocity {
             }
             Spline spline = new Spline(sub, deriv);
             Point[] subPoints = spline.getXYSet();
-            int prevIndex = 0;
+
             for (int j = 0; j < subPoints.length; j++) {
                 double ratio = 1.0;
-                // if (index > (coordinates.length*20 - lastRatio)) {
-                //     ratio = (double)(lastRatio - lastRatioIndex)/(double)lastRatio;
-                //     lastRatioIndex++;
-                // }
+                double tempDistance = subPoints[j].getDistance(endPoint);
+                if (tempDistance < endDistance) {
+                    ratio = tempDistance/endDistance;
+                }
                 double x = subPoints[j].getX();
                 double y = subPoints[j].getY();
-                // if (j < subPoints.length/2) {
-                //     if (first) {
-                //         y = ;
-                //     } else {
-                //         y = (prevOverlap.get(j) + subPoints[j].getY())/2.0;
-                //     }
-                    trajectory.getNextPoint(x, y);
-                    xValues.add(x);
-                    yValues.add(y);
-                    trajectory.setLinVel();
-                    trajectory.setThetaArr();
-                    trajectory.setDtheta();
-                    trajectory.setAngVel();
-                    trajectory.makeArrays();
-                    trajectory.setDet();
-                    trajectory.getRatio();
-                    Double[] wheelSpeeds = trajectory.getWheelSpeed();
-                    wheelSpeeds[0] = ratio*wheelSpeeds[0];
-                    wheelSpeeds[1] = ratio*wheelSpeeds[1];
-                    speeds.add(wheelSpeeds);
-                // } else {
-                //     y = subPoints[j].getY();
-                //     currOverlap.add(y);
-                // }
-
-                index++;
+                trajectory.getNextPoint(x, y);
+                xValues.add(x);
+                yValues.add(y);
+                trajectory.setLinVel();
+                trajectory.setThetaArr();
+                trajectory.setDtheta();
+                trajectory.setAngVel();
+                trajectory.makeArrays();
+                trajectory.setDet();
+                trajectory.getRatio();
+                Double[] wheelSpeeds = trajectory.getWheelSpeed();
+                wheelSpeeds[0] = ratio*wheelSpeeds[0];
+                wheelSpeeds[1] = ratio*wheelSpeeds[1];
+                speeds.add(wheelSpeeds);
             }
 
-            first = false;
             i += subsection - 1;
 
             double lastX = xValues.get(xValues.size() - 1);
