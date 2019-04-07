@@ -13,7 +13,7 @@ public class Velocity {
         Trajectory trajectory = new Trajectory(coordinates[0].getX(), coordinates[0].getY(), 0, 5.0, 10.0, 1);
         int i = 0;
 
-        double endPoint = coordinates[coordinates.length - 1];
+        Point endPoint = coordinates[coordinates.length - 1];
         double distance = coordinates[0].getDistance(endPoint);
         double endDistance = endRatio*distance;
 
@@ -65,14 +65,9 @@ public class Velocity {
             double secondLastX = xValues.get(xValues.size() - 20);
             double secondLastY = yValues.get(yValues.size() - 20);
             deriv = (lastY - secondLastY)/(lastX - secondLastX);
-            prevIndex = 0;
 
-            if (i > (coordinates.length - subsection)) {
+            if (i > (coordinates.length - subsection) && !end) {
                 end = true;
-                i = coordinates.length - (coordinates.length % subsection);
-                if (i >= coordinates.length - 1) {
-                    finish = true;
-                }
             }
             System.out.println("I: " + i);
         }
