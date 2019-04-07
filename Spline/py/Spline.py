@@ -28,35 +28,20 @@ class Spline:
 
         estEnd = float(float((n[len(n) - 1].getY() - n[len(n) - 2].getY()))/(n[len(n) - 1].getX() - n[len(n) - 2].getX()))
 
-        d = [ [0.0] * 1] * len(n)
-        a = [ [0.0] * len(n)] * len(n)
-        u = np.matrix(a)
-        print("initial")
-        print(a)
-        print(d)
+        d = [[0 for j in range(1)] for i in range(len(n))]
+        a = [[0 for i in range(len(n))] for j in range(len(n))]
 
         for i in range(0, len(n)):
             if i == 0:
                 h = float(n[i + 1].getX() - n[i].getX())
                 d[i][0] = (6.0/h)*(n[i + 1].getY() - n[i].getY()) - 6.0*float(begin)
                 a[i][i] = h*2.0
-                print("a[i][i] ", a[i][i])
                 a[i+1][i] = h
-                print("a[i+1][i] ", a[i+1][i])
-                m = np.matrix(a)
-                n = np.matrix(d)
-                print("I = ", i)
-                print(m)
-                print(n)
-                print("H: ", h)
             elif i == (len(n) - 1):
                 h = float(n[i].getX() - n[i - 1].getX())
                 d[i][0] = 6.0*estEnd - (6.0/h)*(n[i].getY() - n[i - 1].getY())
                 a[i][i] = 2.0*h
                 a[i-1][i] = h
-                m = np.matrix(a)
-                print("I = ", i)
-                print(m)
             else:
                 h_upper = float(n[i + 1].getX() - n[i].getX())
                 h_lower = float(n[i].getX() - n[i - 1].getX())
@@ -65,19 +50,30 @@ class Spline:
                 a[i][i] = 2*(h_upper+h_lower)
                 a[i+1][i] = h_upper
                 a[i-1][i] = h_lower
-                m = np.matrix(a)
-                print("I = ", i)
-                print(m)
 
 
-        print(a)
-        z_inv = np.multiply(m.I, d)
-        for w in range(0, len(z_inv)):
-            for e in range(0, len(z_inv[0])):
-                print("[%d][%d]: %d"%(w, e, z_inv[w][e]))
-        for i in range(0, len(z_inv)):
-            print("Z: %d\n"%(z_inv[i][0]))
-            self.z[i] = float(z_inv[i][0])
+        try:
+            z_inv = self.matmult(np.linalg.inv(a), d)
+        except numpy.linalg.LinAlgError:
+            print("Oh no")
+            pass
+        else:
+            for i in range(0, len(z_inv)):
+                self.z[i] = float(z_inv[i][0])
+
+
+    def matmult(self, m1,m2):
+        r=[]
+        m=[]
+        for i in range(len(m1)):
+            for j in range(len(m2[0])):
+                sums=0
+                for k in range(len(m2)):
+                    sums=sums+(m1[i][k]*m2[k][j])
+                r.append(sums)
+            m.append(r)
+            r=[]
+        return m
 
     def getY(self, x, n):
         x = float(x)
@@ -89,7 +85,7 @@ class Spline:
 
     def getA(self, n):
         h = float(self.points[n + 1].getX() - self.points[n].getX())
-        #print("HI: %d"%self.z[n])
+        # print("HI: %d"%self.z[n])
         return float(self.z[n]/(6.0*h))
 
     def getB(self, n):
@@ -252,6 +248,7 @@ class Velocity:
                 x = subPoints[j].getX()
                 y = subPoints[j].getY()
                 trajectory.getNextPoint(x, y)
+
                 xValues.append(float(x))
                 yValues.append(float(y))
                 trajectory.setLinVel()
@@ -278,7 +275,7 @@ class Velocity:
                 end = True
 
         for k in range(0, len(xValues)):
-            f.write("%d,%d\n"%(xValues[k], yValues[k]))
+            f.write("%f,%f\n"%(xValues[k], yValues[k]))
 
         f.close()
 
