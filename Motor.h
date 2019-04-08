@@ -47,10 +47,9 @@ class Motor
 	    Motor(bool motor_AorB, int PWM, int ENC_A, int ENC_B, int AIN1, int AIN2);
 	    // class functions
 	    void setNewSpeed(double new_speed);
-	    void getCount(int32_t countA,  int32_t countB);
 	    void motorForward();
 	    void motorBackward();
-	    double pidControl();
+	    double pidControl(int32_t count);
 
 	private:
 		int _PWM;

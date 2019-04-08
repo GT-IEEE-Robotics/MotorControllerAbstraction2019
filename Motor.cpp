@@ -2,7 +2,7 @@
   Motor.cpp - Library for the Motor class.
   Created by Tianyang Cao, 04/07/2019.
   For IEEE Robotics Motor Abstraction Subteam.
-*/
+*/ 
 
 #include "Arduino.h"
 #include "Motor.h"
@@ -27,7 +27,7 @@ Motor::Motor(bool motor_AorB, int PWM, int ENC_A, int ENC_B, int AIN1, int AIN2)
     motor_id = motor_AorB;      // motor id: 0 - A, 1 - B
     prev_count = 0;
     curr_count = 0;
-    counts_per_rev = 440;   // TO BE CHANGED WITH SPECIFIC MOTOR SPECS
+    counts_per_rev = 480;   // TO BE CHANGED WITH SPECIFIC MOTOR SPECS
     t_duration = 0;
     curr_angular_speed = 0;
     curr_error = 0;
@@ -45,30 +45,23 @@ Motor::Motor(bool motor_AorB, int PWM, int ENC_A, int ENC_B, int AIN1, int AIN2)
 void Motor::setNewSpeed(double new_speed)
 {
     ref_angular_speed = new_speed;
-    curr_error_ang_speed = ref_angular_speed - curr_angular_speed;
-}
-
-void Motor::getCount(int32_t countA, int32_t countB)
-{
-    if (motor_id == 0) { count = countA; }
-    else if (motor_id == 1) { count = countB; }
+    //curr_error_ang_speed = ref_angular_speed - curr_angular_speed;
 }
 
 void Motor::motorForward()
 {
-  digitalWrite(_AIN1, LOW);
-  digitalWrite(_AIN2, HIGH);
+    digitalWrite(_AIN1, LOW);
+    digitalWrite(_AIN2, HIGH);
 }
 
 void Motor::motorBackward()
 {
-  digitalWrite(_AIN1, HIGH);
-  digitalWrite(_AIN2, LOW);
+    digitalWrite(_AIN1, HIGH);
+    digitalWrite(_AIN2, LOW);
 }
 
-double Motor::pidControl()
+double Motor::pidControl(int32_t count)
 {
-    
     prev_count = curr_count;
     curr_count = count;
 
@@ -136,6 +129,7 @@ double Motor::pidControl()
     if (is_first_loop == 1)
     {
         pid_output = pid_p_term;
+        is_first_loop = 0;
     }
     else
     {
@@ -153,20 +147,19 @@ double Motor::pidControl()
     }
 
     /* Finally, produce pwm command for the motor */
-  if (abs(curr_error) <= error_threshold_speed)
-    { analogWrite(_PWM, pwm_output); }
-  else
+    if (abs(curr_error) <= error_threshold_speed)
+    { 
+        analogWrite(_PWM, pwm_output); 
+    }
+    else
     {
-      if (ref_angular_speed >= 0) { motorForward(); }
-      else { motorBackward(); }
+        if (ref_angular_speed >= 0) { motorForward(); }
+        else { motorBackward(); }
         
-      pwm_output = constrain(abs(pid_output), 0, 255);
-      analogWrite(_PWM, pwm_output);
-
+        pwm_output = constrain(abs(pid_output), 0, 255);
+        analogWrite(_PWM, pwm_output);
     }
     
-    is_first_loop = 0;
-
     // print the current motor status
     Serial.print("Motor ID: ");
     Serial.println(motor_id);
