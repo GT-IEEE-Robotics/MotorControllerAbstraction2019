@@ -125,10 +125,10 @@ class Spline:
 
 
 class Trajectory:
-    theta_arr = [0] * 2
-    velocity = [0] * 2
-    wheelbase_inv = [[0] * 2] * 2
-    wheelSpeeds = [[0] * 2] * 2
+    theta_arr = [0, 0]
+    velocity = [0, 0]
+    wheelbase_inv = [[0, 0], [0, 0]]
+    wheelSpeeds = [[0, 0], [0, 0]]
 
     def __init__(self, old_x, old_y, init_theta_input, r_wheel, l_wheelbase, ratio_input):
         self.new_x = old_x
@@ -158,6 +158,8 @@ class Trajectory:
         else:
             self.theta = math.atan(self.dy/self.dx)
 
+        # print("theta: ", self.theta)
+
     def setLinVel(self):
         v1 = 0
         v2 = 0
@@ -176,6 +178,7 @@ class Trajectory:
 
     def setAngVel(self):
         self.ang_vel = self.dtheta
+        # print("ange_vel: ", self.ang_vel)
 
     def setThetaArr(self):
         self.theta_arr[0] = self.theta_arr[1]
@@ -194,15 +197,18 @@ class Trajectory:
 
     def setDet(self):
         self.det = -(self.r*self.r)/(2*self.l)
+        # print("det: ", self.det)
 
     def getRatio(self):
         self.ratio = 2.5 / (abs(self.velocity[1]) + 0.05)
+        # print("ratio: ", self.ratio)
 
     def getWheelSpeed(self):
         self.wheelSpeeds[0] = self.ratio * (1/self.det) * (self.wheelbase_inv[0][0] * self.velocity[0] + self.wheelbase_inv[0][1] * self.velocity[1])
         self.wheelSpeeds[1] = self.ratio * (1/self.det) * (self.wheelbase_inv[1][0] * self.velocity[0] + self.wheelbase_inv[1][1] * self.velocity[1])
         self.wheelSpeeds[0] = abs(self.wheelSpeeds[0])
         self.wheelSpeeds[1] = abs(self.wheelSpeeds[1])
+        # print(self.wheelSpeeds)
         return self.wheelSpeeds
 
 
@@ -214,17 +220,18 @@ class Trajectory:
 class Velocity:
     def __init__(self, coordinates, subsection, constantVelocity, endRatio):
         f = open("hello.csv", "w")
-        speeds = [[]]
         lastRatio = len(coordinates)*20.0*endRatio
         trajectory = Trajectory(coordinates[0].getX(), coordinates[0].getY(), 0, 5.0, 10.0, 1)
         i = 0
+
+        xValues = [coordinates[0].getX()]
+        yValues = [coordinates[0].getY()]
+        speeds = [[0, 0]]
 
         endPoint = coordinates[len(coordinates) - 1]
         distance = coordinates[0].getDistance(endPoint)
         endDistance = endRatio*distance
 
-        xValues = []
-        yValues = []
         deriv = 0
         end = False
         finish = False
@@ -242,9 +249,8 @@ class Velocity:
             for j in range(0, len(subPoints)):
                 ratio = 1
                 tempDistance = subPoints[j].getDistance(endPoint)
-                if (tempDistance < endDistance):
-                    ratio = tempDistance/endDistance
-
+                # if (tempDistance < endDistance):
+                #     ratio = tempDistance/endDistance
                 x = subPoints[j].getX()
                 y = subPoints[j].getY()
                 trajectory.getNextPoint(x, y)
@@ -261,21 +267,22 @@ class Velocity:
                 wheelSpeeds = trajectory.getWheelSpeed()
                 wheelSpeeds[0] = ratio*wheelSpeeds[0]
                 wheelSpeeds[1] = ratio*wheelSpeeds[1]
-                speeds.append(wheelSpeeds)
+                speeds.append([wheelSpeeds[0], wheelSpeeds[1]])
 
             i += subsection - 1
 
             lastX = xValues[len(xValues) - 1]
             lastY = yValues[len(yValues) - 1]
-            secondLastX = xValues[len(xValues) - 20]
-            secondLastY = yValues[len(yValues) - 20]
+            secondLastX = xValues[len(xValues) - 5]
+            secondLastY = yValues[len(yValues) - 5]
             deriv = (lastY - secondLastY)/(lastX - secondLastX)
 
             if (i > (len(coordinates) - subsection) and not end):
                 end = True
 
+
         for k in range(0, len(xValues)):
-            f.write("%f,%f\n"%(xValues[k], yValues[k]))
+            f.write("%f,%f,%f,%f\n"%(xValues[k], yValues[k], speeds[k][0], speeds[k][1]))
 
         f.close()
 
@@ -288,16 +295,16 @@ class Velocity:
 def main():
     p = Point(0,0)
     test = [
-        Point(0.0, 0.0),
-        Point(1.0, 3.0),
+        Point(0.0, 5.0),
+        Point(1.0, 4.0),
         Point(5.0, 6.0),
         Point(7.0, 10.5),
         Point(8.0, 11.0),
-        Point(9.0, 12.9),
-        Point(11.0, 15.6),
-        Point(15.0, 16.8),
+        Point(9.0, 8.9),
+        Point(11.0, 14.6),
+        Point(15.0, 10.8),
         Point(17.0, 17.0),
-        Point(18.0, 19.1)
+        Point(18.0, 12.1)
     ]
     vel = Velocity(test, 5, 10.0, .1)
     print("here!")
