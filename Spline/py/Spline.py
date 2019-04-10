@@ -12,7 +12,8 @@ class Point:
         return float(self.y)
     def getDistance(self, two):
         return float(math.sqrt((two.getX() - self.x)**2 + ((two.getY() - self.y)**2)))
-
+    def getTheta(self, two):
+        return math.atan((two.getY() - self.y)/(two.getX() - self.x))
 
 
 
@@ -160,6 +161,9 @@ class Trajectory:
 
         # print("theta: ", self.theta)
 
+    def getTheta(self):
+        return self.theta
+
     def setLinVel(self):
         v1 = 0
         v2 = 0
@@ -218,7 +222,7 @@ class Trajectory:
 
 
 class Velocity:
-    def __init__(self, coordinates, subsection, constantVelocity, endRatio):
+    def __init__(self, coordinates, subsection, constantVelocity, endRatio, l_wheelbase):
         f = open("hello.csv", "w")
         lastRatio = len(coordinates)*20.0*endRatio
         trajectory = Trajectory(coordinates[0].getX(), coordinates[0].getY(), 0, 5.0, 10.0, 1)
@@ -226,7 +230,9 @@ class Velocity:
 
         xValues = [coordinates[0].getX()]
         yValues = [coordinates[0].getY()]
-        speeds = [[0, 0]]
+        self.speeds = [[0, 0]]
+
+        self.times = [0]
 
         endPoint = coordinates[len(coordinates) - 1]
         distance = coordinates[0].getDistance(endPoint)
@@ -235,6 +241,8 @@ class Velocity:
         deriv = 0
         end = False
         finish = False
+
+        prev = coordinates[0]
 
         while (not finish) and ((i <= (len(coordinates) - subsection)) or end):
             if end:
@@ -249,25 +257,38 @@ class Velocity:
             for j in range(0, len(subPoints)):
                 ratio = 1
                 tempDistance = subPoints[j].getDistance(endPoint)
-                # if (tempDistance < endDistance):
-                #     ratio = tempDistance/endDistance
+                if (tempDistance < endDistance):
+                    ratio = tempDistance/endDistance
                 x = subPoints[j].getX()
                 y = subPoints[j].getY()
                 trajectory.getNextPoint(x, y)
 
+                delta_d = subPoints[j].getDistance(prev)
+
                 xValues.append(float(x))
                 yValues.append(float(y))
-                trajectory.setLinVel()
-                trajectory.setThetaArr()
-                trajectory.setDtheta()
-                trajectory.setAngVel()
-                trajectory.makeArrays()
-                trajectory.setDet()
-                trajectory.getRatio()
-                wheelSpeeds = trajectory.getWheelSpeed()
-                wheelSpeeds[0] = ratio*wheelSpeeds[0]
-                wheelSpeeds[1] = ratio*wheelSpeeds[1]
-                speeds.append([wheelSpeeds[0], wheelSpeeds[1]])
+                # trajectory.setLinVel()
+                # trajectory.setThetaArr()
+                # trajectory.setDtheta()
+                # trajectory.setAngVel()
+                # trajectory.makeArrays()
+                # trajectory.setDet()
+                # trajectory.getRatio()
+                # wheelSpeeds = trajectory.getWheelSpeed()
+                wheelSpeeds = [0, 0]
+                theta_ratio = abs(trajectory.getTheta()) / (math.pi / 2)
+                wheelSpeeds[0] = theta_ratio*ratio*(2*constantVelocity - l_wheelbase*trajectory.getTheta())/2
+                wheelSpeeds[1] = theta_ratio*ratio*(2*constantVelocity + l_wheelbase*trajectory.getTheta())/2
+
+                avg_v = (wheelSpeeds[0] + wheelSpeeds[1]) / 2
+                if (avg_v != 0):
+                    self.times.append(delta_d / avg_v)
+                else:
+                    self.times.append(0)
+
+                self.speeds.append([wheelSpeeds[0], wheelSpeeds[1]])
+
+                prev = subPoints[j]
 
             i += subsection - 1
 
@@ -282,32 +303,49 @@ class Velocity:
 
 
         for k in range(0, len(xValues)):
-            f.write("%f,%f,%f,%f\n"%(xValues[k], yValues[k], speeds[k][0], speeds[k][1]))
+            f.write("%f,%f,%f,%f,%f\n"%(xValues[k], yValues[k], self.speeds[k][0], self.speeds[k][1], self.times[k]))
 
         f.close()
 
+    def getSpeeds(self):
+        return self.speeds
+
+    def getTimes(self):
+        return self.times
 
 
 
+# The situation:
+# You're going to only use this here Velocity class (you can ignore the others)
+# Stuff you're gonna need to give it
+#   your list of coordinates
+#   how frequently you want spline to happen (the subsection of spline coordinates)
+#   the velocity (central, assuming the robot is going straight and nowhere near its destinayion)
+#   When you want the robot to start slowing down (like before it reaches the target... the last tenth? fifth? you decide.. )
+#   wheel to wheel length of robot
+# Stuff you're gonna get
+#   an array of speeds, separated into left and right sides of the robot!
+#   an array of times correlating to these speeds
+#       i.e. go bla bla speed for bla bla seconds
 
 
+# Tester class!!!
+# def main():
+#     p = Point(0,0)
+#     test = [
+#         Point(0.0, 5.0),
+#         Point(1.0, 4.0),
+#         Point(5.0, 6.0),
+#         Point(7.0, 10.5),
+#         Point(8.0, 11.0),
+#         Point(9.0, 8.9),
+#         Point(11.0, 14.6),
+#         Point(15.0, 10.8),
+#         Point(17.0, 17.0),
+#         Point(18.0, 12.1)
+#     ]
+#     vel = Velocity(test, 5, 10.0, .1, 3)
+#     print("here!")
 
-def main():
-    p = Point(0,0)
-    test = [
-        Point(0.0, 5.0),
-        Point(1.0, 4.0),
-        Point(5.0, 6.0),
-        Point(7.0, 10.5),
-        Point(8.0, 11.0),
-        Point(9.0, 8.9),
-        Point(11.0, 14.6),
-        Point(15.0, 10.8),
-        Point(17.0, 17.0),
-        Point(18.0, 12.1)
-    ]
-    vel = Velocity(test, 5, 10.0, .1)
-    print("here!")
-
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
