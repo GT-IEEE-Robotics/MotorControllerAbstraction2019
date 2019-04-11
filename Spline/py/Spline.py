@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-
+#
 class Point:
     def __init__(self, x_temp, y_temp):
         self.x = float(x_temp)
@@ -219,6 +219,22 @@ class Trajectory:
 
 
 
+#coordinates: are the next set of waypoints from path planning, type: double
+
+#subsection: number of points from spline wanted to sample for path, type double
+
+#constantVelocity: max velocity that the robot should go over subsection, type double
+#                  
+#endRatio: determines when to slow down robot over path
+#       Ex. To slow robot down for last tenth of subsection, endRatio = .1
+
+#l_wheelbase: size of wheelbase of the robot, needs to be measured, type double
+
+#OUTPUTS:
+
+#speeds: an array of wheel speeds split into left and right wheels, type double
+#times: an array of times, how long to each respective speed, type double
+
 
 
 class Velocity:
@@ -316,7 +332,7 @@ class Velocity:
 
 
 # The situation:
-# You're going to only use this here Velocity class (you can ignore the others)
+# You're going to only call this here Velocity class
 # Stuff you're gonna need to give it
 #   your list of coordinates
 #   how frequently you want spline to happen (the subsection of spline coordinates)
@@ -327,6 +343,12 @@ class Velocity:
 #   an array of speeds, separated into left and right sides of the robot!
 #   an array of times correlating to these speeds
 #       i.e. go bla bla speed for bla bla seconds
+
+
+
+
+
+
 
 
 # Tester class!!!
