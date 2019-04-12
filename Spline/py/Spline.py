@@ -224,7 +224,7 @@ class Trajectory:
 #subsection: number of points from spline wanted to sample for path, type double
 
 #constantVelocity: max velocity that the robot should go over subsection, type double
-#                  
+#
 #endRatio: determines when to slow down robot over path
 #       Ex. To slow robot down for last tenth of subsection, endRatio = .1
 
@@ -293,6 +293,11 @@ class Velocity:
                 # wheelSpeeds = trajectory.getWheelSpeed()
                 wheelSpeeds = [0, 0]
                 theta_ratio = abs(trajectory.getTheta()) / (math.pi / 2)
+                if (theta_ratio < .4):
+                    theta_ratio = .4
+                if (theta_ratio > 1):
+                    theta_ratio = 1
+                print(theta_ratio)
                 wheelSpeeds[0] = theta_ratio*ratio*(2*constantVelocity - l_wheelbase*trajectory.getTheta())/2
                 wheelSpeeds[1] = theta_ratio*ratio*(2*constantVelocity + l_wheelbase*trajectory.getTheta())/2
 
@@ -352,22 +357,22 @@ class Velocity:
 
 
 # Tester class!!!
-# def main():
-#     p = Point(0,0)
-#     test = [
-#         Point(0.0, 5.0),
-#         Point(1.0, 4.0),
-#         Point(5.0, 6.0),
-#         Point(7.0, 10.5),
-#         Point(8.0, 11.0),
-#         Point(9.0, 8.9),
-#         Point(11.0, 14.6),
-#         Point(15.0, 10.8),
-#         Point(17.0, 17.0),
-#         Point(18.0, 12.1)
-#     ]
-#     vel = Velocity(test, 5, 10.0, .1, 3)
-#     print("here!")
+def main():
+    p = Point(0,0)
+    test = [
+        Point(0.0, 5.0),
+        Point(1.0, 4.0),
+        Point(5.0, 6.0),
+        Point(7.0, 10.5),
+        Point(8.0, 11.0),
+        Point(9.0, 8.9),
+        Point(11.0, 14.6),
+        Point(15.0, 10.8),
+        Point(17.0, 17.0),
+        Point(18.0, 12.1)
+    ]
+    vel = Velocity(test, 5, 10.0, .1, 3)
+    print("here!")
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
